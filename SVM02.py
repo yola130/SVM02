@@ -1,68 +1,115 @@
 import streamlit as st
 import joblib
 import pandas as pd
+import numpy as np
 
+# 配置页面元信息
+st.set_page_config(
+    page_title="COVID-19亚型分类系统",
+    page_icon="🦠",
+    layout="centered"
+)
 
-# Load the model
-model = joblib.load('SVM02.pkl')
+# 常量定义
+HIGH_RISK_THRESHOLD = 0.32  # 高风险阈值
+FEATURE_RANGES = {
+    "ALB": (20, 50, 35),
+    "Neutrophils": (2, 20, 6),
+    "HCO3": (15, 35, 25),
+    "APTT": (20, 60, 40),
+    "Fg": (1.5, 5.0, 3.0),
+    "BUN": (2, 50, 5),
+    "PT": (10, 20, 12),
+    "LDH": (100, 3000, 270),
+    "DBIL": (1, 30, 5)
+}
 
-# Define feature names
-feature_names = ["ALB", "Neutrophils", "HCO3", "APTT", "Fg", "BUN", "PT","LDH", "DBIL"]
+def load_model(model_path='SVM02.pkl'):
+    """安全加载机器学习模型"""
+    try:
+        return joblib.load(model_path)
+    except Exception as e:
+        st.error(f"模型加载失败: {str(e)}")
+        st.stop()
 
-# Streamlit user interface
-st.title("COVID-19 Subphenotype Classifier")
+def validate_inputs(inputs):
+    """输入数据验证"""
+    alerts = []
+    if inputs['LDH'] > 1000:
+        alerts.append("⚠️ LDH>1000建议复查检测值")
+    if inputs['Neutrophils'] > 15:
+        alerts.append("⚠️ 中性粒细胞>15×10⁹/L提示严重感染")
+    return alerts
 
-# ALB: numerical input
-ALB = st.number_input("ALB:", min_value=0, max_value=100, value=35)
-
-# Neutrophils: numerical input
-Neutrophils = st.number_input("Neutrophils:", min_value=0, max_value=100, value=6)
-
-# HCO3: numerical input
-HCO3 = st.number_input("HCO3:", min_value=0, max_value=100, value=25)
-
-# APTT: numerical input
-APTT = st.number_input("APTT:", min_value=0, max_value=100, value=40)
-
-# Fg: numerical input
-Fg = st.number_input("Fg:", min_value=0, max_value=50, value=3)
-
-# BUN: numerical input
-BUN = st.number_input("BUN:", min_value=0, max_value=200, value=5)
-
-# PT: numerical input
-PT = st.number_input("PT:", min_value=0, max_value=100, value=12)
-
-# LDH: numerical input
-LDH = st.number_input("LDH:", min_value=50, max_value=4000, value=270)
-
-# DBIL: numerical input
-DBIL = st.number_input("DBIL:", min_value=0, max_value=100, value=5)
-
-
-# Process inputs and make predictions
-# feature_values = [ALB, Neutrophils, HCO3, APTT, Fg, BUN, PT, LDH, DBIL]
-# features = np.array([feature_values])
-data = {"ALB": [ALB], "Neutrophils": [Neutrophils], "HCO3": [HCO3], "APTT": [APTT], "Fg": [Fg], "BUN": [BUN], "PT": [PT], "LDH": [LDH], "DBIL": [DBIL]}
-features = pd.DataFrame(data)
-
-if st.button("Predict"):
-    # Predict probabilities
-    predicted_proba = model.predict_proba(features)[0]
-
+def main():
+    # 初始化模型
+    model = load_model()
     
-    # 根据预测概率的最高值来确定预测类别（但这里我们直接根据概率阈值判断）  
-    high_risk_threshold = 0.32  # 32% 的阈值  
-    if predicted_proba[1] > high_risk_threshold:  # 假设模型输出的第二个概率是高风险类的概率  
-        predicted_class = 1  # Subphenotype2 
-    else:  
-        predicted_class = 0  # Subphenotype1
+    st.title("COVID-19临床亚型智能分类系统")
+    st.markdown("---")
+    
+    # 动态生成输入组件
+    inputs = {}
+    cols = st.columns(3)
+    for idx, (feature, (min_val, max_val, default)) in enumerate(FEATURE_RANGES.items()):
+        with cols[idx%3]:
+            inputs[feature] = st.number_input(
+                label=f"{feature}:",
+                min_value=min_val,
+                max_value=max_val,
+                value=default,
+                step=0.1 if feature in ['Fg'] else 1
+            )
+    
+    # 输入验证
+    alerts = validate_inputs(inputs)
+    if alerts:
+        st.warning("\n\n".join(alerts))
+    
+    # 预测执行
+    if st.button("开始分析", type="primary"):
+        try:
+            # 构建特征矩阵
+            features = pd.DataFrame([inputs])
+            
+            # 获取预测概率
+            proba = model.predict_proba(features)[0]
+            risk_score = proba[1]  # 假设类别1为高风险
+            
+            # 结果可视化
+            st.markdown("---")
+            progress_bar = st.progress(0)
+            for percent in range(0, int(risk_score*100)+1, 5):
+                progress_bar.progress(percent/100)
+            
+            # 诊断结论
+            if risk_score > HIGH_RISK_THRESHOLD:
+                st.error(f"## 高危亚型 (Subphenotype II)\n"
+                         f"**风险评估值**: {risk_score:.1%} "
+                         f"(阈值 {HIGH_RISK_THRESHOLD:.0%})")
+                st.markdown("**临床建议**:\n"
+                            "- 立即启动抗炎治疗\n"
+                            "- 监测凝血功能\n"
+                            "- 建议ICU监护")
+            else:
+                st.success(f"## 标准亚型 (Subphenotype I)\n"
+                          f"**风险评估值**: {risk_score:.1%}")
+                st.markdown("**临床建议**:\n"
+                            "- 常规抗病毒治疗\n"
+                            "- 每日生命体征监测\n"
+                            "- 营养支持治疗")
+            
+            # 显示特征重要性
+            if hasattr(model, 'coef_'):
+                st.markdown("### 关键预测因素")
+                coef_df = pd.DataFrame({
+                    '特征': FEATURE_RANGES.keys(),
+                    '权重': model.coef_[0]
+                }).sort_values('权重', ascending=False)
+                st.bar_chart(coef_df.set_index('特征'))
+                
+        except Exception as e:
+            st.error(f"预测过程中发生错误: {str(e)}")
 
-    # 显示预测结果  
-    text = f"Predicted Class: {'*Subphenotype 2*' if predicted_class == 1 else '*Subphenotype 1*'}"
-    st.subheader(text, anchor=False)
-        
-    # 根据预测类别给出建议
-    advice = f"Based on the model, predicted that the probability of Subphenotype 2 is *{predicted_proba[1] * 100:.1f}%*."
-
-    st.subheader(advice, anchor=False)
+if __name__ == "__main__":
+    main()

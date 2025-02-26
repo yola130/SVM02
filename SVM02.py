@@ -22,7 +22,6 @@ FEATURE_RANGES = {
     "HCO3": (0, 100, 25),
     "LDH": (100, 3000, 270),
     "DBIL": (1, 100, 5)
-
 }
 
 def load_model(model_path='SVM02.pkl'):

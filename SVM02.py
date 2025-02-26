@@ -44,8 +44,7 @@ DBIL = st.number_input("DBIL:", min_value=0, max_value=100, value=5)
 # Process inputs and make predictions
 # feature_values = [ALB, Neutrophils, HCO3, APTT, Fg, BUN, PT, LDH, DBIL]
 # features = np.array([feature_values])
-data = {"ALB": [ALB], "Neutrophils": [Neutrophils], "HCO3":[HCO3],  "APTT":[APTT], "Fg": [Fg], "BUN":[BUN], 
-       "PT": [PT], "LDH":[LDH], "DBIL":[DBIL]}
+data = {"ALB": [ALB], "Neutrophils": [Neutrophils], "HCO3": [HCO3], "APTT": [APTT], "Fg": [Fg], "BUN": [BUN], "PT": [PT], "LDH": [LDH], "DBIL": [DBIL]}
 features = pd.DataFrame(data)
 
 if st.button("Predict"):

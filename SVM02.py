@@ -39,7 +39,6 @@ LDH = st.number_input("LDH:", min_value=50, max_value=4000, value=270)
 # DBIL: numerical input
 DBIL = st.number_input("DBIL:", min_value=0, max_value=100, value=5)
 
- ["ALB", "Neutrophils", "HCO3", "APTT", "Fg", "BUN", "PT","LDH", "DBIL"]
 
 # Process inputs and make predictions
 # feature_values = [ALB, Neutrophils, HCO3, APTT, Fg, BUN, PT, LDH, DBIL]

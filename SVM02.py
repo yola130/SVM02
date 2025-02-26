@@ -13,15 +13,16 @@ st.set_page_config(
 # 常量定义
 HIGH_RISK_THRESHOLD = 0.32  # 高风险阈值
 FEATURE_RANGES = {
-    "ALB": (20, 50, 35),
-    "Neutrophils": (2, 20, 6),
-    "HCO3": (15, 35, 25),
-    "APTT": (20, 60, 40),
-    "Fg": (1.5, 5.0, 3.0),
-    "BUN": (2, 50, 5),
+    "Neutrophils": (0, 50, 6),
     "PT": (10, 20, 12),
+    "APTT": (0, 100, 40),
+    "Fg": (0, 20, 3.0),
+    "ALB": (10, 100, 35),
+    "BUN": (0, 200, 5),
+    "HCO3": (0, 100, 25),
     "LDH": (100, 3000, 270),
-    "DBIL": (1, 30, 5)
+    "DBIL": (1, 100, 5)
+
 }
 
 def load_model(model_path='SVM02.pkl'):

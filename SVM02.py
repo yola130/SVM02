@@ -59,8 +59,8 @@ if st.button("Predict"):
         predicted_class = 0  # Subphenotype1
 
     # 显示预测结果  
-   text = f"Predicted Class: {'*Subphenotype 2*' if predicted_class == 1 else '*Subphenotype 1*'}"
-   st.subheader(text, anchor=False)
+    text = f"Predicted Class: {'*Subphenotype 2*' if predicted_class == 1 else '*Subphenotype 1*'}"
+    st.subheader(text, anchor=False)
         
     # 根据预测类别给出建议
     advice = f"Based on the model, predicted that the probability of Subphenotype 2 is *{predicted_proba[1] * 100:.1f}%*."

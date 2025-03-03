@@ -14,31 +14,31 @@ def main():
     st.title("COVID-19 Subphenotype Classifier")
 
     # Neutrophils: numerical input
-    Neutrophils = st.number_input("Neutrophils:", min_value=0, max_value=50, value=6)
+    Neutrophils = st.number_input("Neutrophils:", min_value=0.00, max_value=50.00, value=6.00, step=0.01, format="%0.2f")
     
     # PT: numerical input
-    PT = st.number_input("PT:", min_value=0, max_value=50, value=12)
+    PT = st.number_input("PT:", min_value=0.00, max_value=50.00, value=12.00, step=0.01, format="%0.2f")
     
     # APTT: numerical input
-    APTT = st.number_input("APTT:", min_value=0, max_value=800, value=35)
+    APTT = st.number_input("APTT:", min_value=0.00, max_value=800.00, value=35.00, step=0.01, format="%0.2f")
         
     # Fg: numerical input
-    Fg = st.number_input("Fg:", min_value=0, max_value=20, value=3)
+    Fg = st.number_input("Fg:", min_value=0.00, max_value=20.00, value=3.00, step=0.01, format="%0.2f")
     
     # ALB: numerical input
-    ALB = st.number_input("ALB:", min_value=0, max_value=100, value=35)
+    ALB = st.number_input("ALB:", min_value=0.00, max_value=100.00, value=35.00, step=0.01, format="%0.2f")
 
     # BUN: numerical input
-    BUN = st.number_input("BUN:", min_value=0, max_value=100, value=7)
+    BUN = st.number_input("BUN:", min_value=0.00, max_value=100.00, value=7.00, step=0.01, format="%0.2f")
     
     # HCO3: numerical input
-    HCO3 = st.number_input("HCO3:", min_value=0, max_value=50, value=25)
+    HCO3 = st.number_input("HCO3:", min_value=0.00, max_value=50.00, value=25.00, step=0.01, format="%0.2f")
     
     # LDH: numerical input
-    LDH = st.number_input("LDH:", min_value=50, max_value=4000, value=270)
+    LDH = st.number_input("LDH:", min_value=50.00, max_value=4000.00, value=270.00, step=0.01, format="%0.2f")
 
     # DBIL: numerical input
-    DBIL = st.number_input("DBIL:", min_value=0, max_value=100, value=10)
+    DBIL = st.number_input("DBIL:", min_value=0.00, max_value=100.00, value=10.00, step=0.01, format="%0.2f")
 
     # Process inputs and make predictions
     feature_values = [Neutrophils, PT, APTT, Fg, ALB, BUN, HCO3, LDH, DBIL]
